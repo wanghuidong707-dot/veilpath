@@ -56,6 +56,14 @@ enum SelfTestRunner {
         checks.append(testDirectoryAccess(name: "App Group containers", path: ContainerKind.appGroup.rootPath))
         checks.append(testDirectoryAccess(name: "System Group containers", path: ContainerKind.systemGroup.rootPath))
         #endif
+        let sandboxRoundTrip = ReadWriteVerification.run()
+        checks.append(SelfTestReport.Check(
+            name: "App sandbox file round trip",
+            path: "app temporary directory",
+            status: sandboxRoundTrip.success ? .passed : .failed,
+            detail: sandboxRoundTrip.message,
+            durationMilliseconds: 0
+        ))
         checks.append(testStructuredFormats())
         checks.append(testAdvancedPreviewFormats())
         checks.append(testFileAnalysis())
