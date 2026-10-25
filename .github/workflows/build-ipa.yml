@@ -37,7 +37,7 @@ jobs:
           EXEC=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$APP/Info.plist")
           test -s "$APP/$EXEC"
           file "$APP/$EXEC"
-          lipo -verify_arch arm64 "$APP/$EXEC"
+          lipo "$APP/$EXEC" -verify_arch arm64
           mkdir -p output/Payload
           ditto "$APP" output/Payload/Veilpath.app
           cd output
