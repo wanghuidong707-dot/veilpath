@@ -1,0 +1,53 @@
+name: Build Veilpath IPA
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/build-ipa.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - name: Validate sources
+        run: |
+          jq empty Veilpath/Localizable.xcstrings
+          git diff --check
+          xcodebuild -version
+      - name: Validate simulator build
+        run: |
+          xcodebuild -project Veilpath.xcodeproj -scheme Veilpath -sdk iphonesimulator -configuration Debug -derivedDataPath /tmp/veilpath-simulator CODE_SIGNING_ALLOWED=NO build
+      - name: Build for iPhone
+        run: |
+          xcodebuild -project Veilpath.xcodeproj -scheme Veilpath -sdk iphoneos -destination 'generic/platform=iOS' -configuration Release -derivedDataPath /tmp/veilpath-device CODE_SIGNING_ALLOWED=NO build
+      - name: Package and verify IPA
+        run: |
+          set -euo pipefail
+          APP=/tmp/veilpath-device/Build/Products/Release-iphoneos/Veilpath.app
+          test -d "$APP"
+          plutil -lint "$APP/Info.plist"
+          EXEC=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$APP/Info.plist")
+          test -s "$APP/$EXEC"
+          file "$APP/$EXEC"
+          lipo -verify_arch arm64 "$APP/$EXEC"
+          mkdir -p output/Payload
+          ditto "$APP" output/Payload/Veilpath.app
+          cd output
+          /usr/bin/zip -qry Veilpath-unsigned.ipa Payload
+          unzip -t Veilpath-unsigned.ipa
+          shasum -a 256 Veilpath-unsigned.ipa > Veilpath-unsigned.ipa.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Veilpath-unsigned-IPA
+          path: |
+            output/Veilpath-unsigned.ipa
+            output/Veilpath-unsigned.ipa.sha256
+          if-no-files-found: error
