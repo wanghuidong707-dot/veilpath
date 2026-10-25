@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - '.github/workflows/build-ipa.yml'
+      - 'Veilpath/Diagnostics/**'
 
 permissions:
   contents: read
