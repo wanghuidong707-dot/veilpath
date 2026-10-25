@@ -1,0 +1,29 @@
+name: Veilpath Build Check
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: macos-15
+
+    steps:
+      - name: Download source
+        uses: actions/checkout@v4
+
+      - name: Check Xcode
+        run: |
+          xcodebuild -version
+          xcode-select -p
+          xcodebuild -showsdks
+
+      - name: Check Veilpath project
+        run: |
+          xcodebuild -list -project Veilpath.xcodeproj
+
+      - name: Check build settings
+        run: |
+          xcodebuild -showBuildSettings \
+            -project Veilpath.xcodeproj \
+            -scheme Veilpath \
+            CODE_SIGNING_ALLOWED=NO
