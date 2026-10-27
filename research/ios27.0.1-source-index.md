@@ -27,6 +27,8 @@
 | C | [DahanGuy/airlift-windows](https://github.com/DahanGuy/airlift-windows) | 作者只明确测试过 iOS 27.0 RC；27.0.1 未证实 | Windows Python 脚本 | Windows 移植参考；需要电脑/可信设备连接。 |
 | C | [AldazActivator/airlift-rw](https://github.com/AldazActivator/airlift-rw) | README 主要说明 27.0 RC，27.0.1 未证实 | macOS / 配对主机读写研究 | AirLift 主机端扩展读/替换原语参考；需单独审查其适用版本和读写保护。 |
 
+**修补状态补充（2026-10-27，作者回复）：** [AirliftSilence-iOS Issue #7](https://github.com/YiHoooong/AirliftSilence-iOS/issues/7#issuecomment-6431542894) 中，用户报告升级至 **iOS 27.2 RC** 后原有读回/替换流程失败；作者 YiHoooong 明确回复「27.2rc 已经修复了」。这是**作者确认的 RC 修补状态及单个用户故障报告**，与 README 已列的「27.2 beta 3+ 已修复」一致；不是对 iOS 27.0.1 新增任意 `/var` 读写能力的独立验证。
+
 ## 二、相关但不能直接算作 27.0.1 文件访问漏洞的项目
 
 | 仓库 | 已知范围/定位 | 为什么暂不选作 27.0.1 IPA 的漏洞核心 |
