@@ -18,6 +18,7 @@
 |---|---|---|---|---|
 | A | [0xjohnnydev/airlift](https://github.com/0xjohnnydev/airlift) | **基础漏洞**：原始 PoC 实测 27.0 RC、正式版 27.0；**不是** 27.0.1 直接证明 | PoC 源码；不是 iPhone IPA | AirTraffic/ATAirlock 跨媒体目录边界；证明部分路径创建随机测试文件并回读；原 PoC 无通用目录枚举和原文件任意覆盖能力。 |
 | A | [YiHoooong/AirliftSilence](https://github.com/YiHoooong/AirliftSilence) | **作者明确实机验证**：27.0.1（24A446）读取、替换、恢复，重启后仍保持 | Windows 源码及 EXE | 证据最明确，但初始可信配对要求 USB；仅验证特定文件，不能推广到整个 `/var`。其功能涉及录音提醒，研究时不应复用该隐私敏感用途。 |
+| B | [jiutinglifeng/ios-calltone-silence](https://github.com/jiutinglifeng/ios-calltone-silence) | **作者自述真机记录**：Mac + iOS 27.0.1（24A446）特定音频文件读取、替换、哈希回读及重启复测；[Issue #2](https://github.com/jiutinglifeng/ios-calltone-silence/issues/2) 为**第三方用户自述** Windows 11 + iPhone17,3 / 24A446 指定文件替换、SHA-256 回读一致；**均非独立核验** | Python 主机端源码，MIT；无 IPA Release | **需电脑与 USB 信任连接**；不需手机 IPA 签名或 LocalDevVPN，亦不等于无需建立设备信任。只能支持特定用户数据文件操作的结论；不是通用 `/var` 枚举、覆盖或免 USB 证据。原项目功能涉及通话录音告知音，不作为 Veilpath 的功能移植目标。 |
 | A | [Mak5er/AirCard-iOS](https://github.com/Mak5er/AirCard-iOS) | README **明确列出支持 27.0–27.0.1** | SwiftUI、Rust `rust-core`、`AirliftFFI`、IPA Release | **最有价值的手机端架构参考**：LocalDevVPN、本机/导入配对、AirTraffic 接口；已有应用功能以指定缓存与素材为主，不能据此断言任意文件可读写。 |
 | A | [YiHoooong/AirliftSilence-iOS](https://github.com/YiHoooong/AirliftSilence-iOS) | README 声称支持 iOS 18.0–27.2 beta 2，覆盖 27.0.1；未在此独立实测 | SwiftUI + Rust、[IPA Release](https://github.com/YiHoooong/AirliftSilence-iOS/releases) | **手机端读写验证逻辑参考**：新增只回传文件大小和 SHA-256 的读取/回写校验；需 LocalDevVPN、配对以及 Books 初始化；用途原为录音提示音修改，不应直接照搬。 |
 | B | [LinkPass888/AirBeep](https://github.com/LinkPass888/AirBeep) | 作者支持范围包括 27.0.1；[2026-10-09 v2.3.0 更新](https://github.com/LinkPass888/AirBeep/releases)明确修复 27.0.1 读取探针异常 | iOS 工程、GitHub Actions unsigned IPA | 可参考读取故障日志、配对文件导入和云编译流程；**不把功能本身列作目标**。 |
@@ -26,6 +27,8 @@
 | B | [dhava-gautama/AirCard-Windows](https://github.com/dhava-gautama/AirCard-Windows) | README 声称 27.0.1；公开实测主要在 26.6、18.7.1，27.0 有第三方报告 | Windows Rust 派生 | 参考 AirTraffic 握手、探针和错误处理；不构成 27.0.1 已实测的直接证据。 |
 | C | [DahanGuy/airlift-windows](https://github.com/DahanGuy/airlift-windows) | 作者只明确测试过 iOS 27.0 RC；27.0.1 未证实 | Windows Python 脚本 | Windows 移植参考；需要电脑/可信设备连接。 |
 | C | [AldazActivator/airlift-rw](https://github.com/AldazActivator/airlift-rw) | README 主要说明 27.0 RC，27.0.1 未证实 | macOS / 配对主机读写研究 | AirLift 主机端扩展读/替换原语参考；需单独审查其适用版本和读写保护。 |
+
+**新增来源核查（2026-10-28；原始证据发表于 2026-10-19 或更早）：** `jiutinglifeng/ios-calltone-silence` 的 [README](https://github.com/jiutinglifeng/ios-calltone-silence/blob/main/README.md) 记录 Mac/USB 在 24A446 上的指定文件「读出 → 覆盖 → 回读哈希 → 重启后复测」，[Issue #2](https://github.com/jiutinglifeng/ios-calltone-silence/issues/2) 则由第三方用户报告 Windows 11、iPhone17,3 上两条指定文件的 `previousSize` 与 SHA-256 回读一致。两者均属于**作者/用户提供的可追溯测试叙述，不是本监测独立执行的设备测试**。Windows 测试未提供重启后持久性复测；没有证明列目录、任意读取或任意覆盖其他受保护文件。需要 USB，不能解决用户 USB 不可用的问题。此条仅作为来源索引，不集成代码或复用录音告知音修改用途。
 
 **修补状态补充（2026-10-27，作者回复）：** [AirliftSilence-iOS Issue #7](https://github.com/YiHoooong/AirliftSilence-iOS/issues/7#issuecomment-6431542894) 中，用户报告升级至 **iOS 27.2 RC** 后原有读回/替换流程失败；作者 YiHoooong 明确回复「27.2rc 已经修复了」。这是**作者确认的 RC 修补状态及单个用户故障报告**，与 README 已列的「27.2 beta 3+ 已修复」一致；不是对 iOS 27.0.1 新增任意 `/var` 读写能力的独立验证。
 
