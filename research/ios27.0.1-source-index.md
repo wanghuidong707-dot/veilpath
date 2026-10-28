@@ -49,6 +49,11 @@
 - **版本、安装与许可证：** 作者报告在 iOS 26.5、27.0、27.0.1 真机成功，未给出 iOS 26.6/26.6.1/26.6.2 各版本的独立日志；Apple 修补信息涵盖 iOS/iPadOS 26.7.2 与 27.2。仓库为 **Xcode 工程与 PoC 源码，未见已签名或普通用户可直接安装的 IPA**；构建/安装需 Mac、Xcode 和开发签名，首次部署通常需要 USB/设备信任（不能推断支持免 USB 首次安装）；运行时利用的是手机内 CoreMedia 服务，README 未要求 LocalDevVPN、AirLift 或主机端持续连接。仓库未见明确 LICENSE，**不得假设可以复制或合并源码**。
 - **研究结论：** 这是新的 **24A446 受限只读 PoC/作者日志**，与 AirTraffic 文件搬运不同；对只读研究有价值，**不满足用户的任意 `/var` 读写或免 USB 即装即用 IPA 目标**。仅新增证据索引，未合并漏洞代码或修改构建。
 
+### 2026-10-28 21:45（北京时间）补充：周边 PR 与失败验证（不改变 24A446 结论）
+
+- **AirTraffic 在 iOS 27.2 的写入假阳性（第三方用户记录，尚未合并）：** [jiutinglifeng/ios-calltone-silence Issue #4](https://github.com/jiutinglifeng/ios-calltone-silence/issues/4) 于 2026-10-28 20:52 北京时间由外部用户 `pomark20` 提交，称 iPhone19,7 / iOS 27.2（24B119）+ Apple Silicon Mac / USB 环境下，`write` 返回 `ok:true`，但同一路径回读失败。其 [PR #3](https://github.com/jiutinglifeng/ios-calltone-silence/pull/3)（20:41 创建、**仍未合并**）提供 226 行评估文档与 README 修订，分析 AirTraffic 越界目标被忽略、AFC 目录边界及若干失败通道。**证据等级：第三方用户自述日志和提议文档；不是原仓库作者实机认证，更不是本监测独立复现。** 此前已有 27.2 beta 3 / RC 修补信息，因此属于新失败复现和工具返回值语义提醒，**不是修补状态新改变**。不能从 API 返回成功推断创建/覆盖成功，必须远端回读字节/哈希，必要时重启复测；也不能反推 27.0.1 的新能力。该项目仍是电脑端工具，需已建立可信配对/USB，不提供免 USB 手机 IPA。
+- **Liter8 扩展到其他版本的实验性代码（不属于监测目标系统）：** [Xplo8E/Liter8 PR #30](https://github.com/Xplo8E/Liter8/pull/30) 于 2026-10-28 20:39 北京时间由贡献者 `gru2007` 提交，**仍未合并**；43 个文件约 5,290 行新增，拟支持 iPad 8 Wi-Fi（A12 / `iPad11,6`）在 iPadOS **26.7.1（23H30）/26.7.2（23H128）** 上的有线实验性启动。贡献者在 [26.7.1 测试记录](https://github.com/gru2007/Liter8-iPad8/blob/ipad8-lite/docs/runs/IPAD8_J171AAP_23H30.md) 自述恢复、SSHRD、进入 UI 与 SSH 成功；[26.7.2 记录](https://github.com/gru2007/Liter8-iPad8/blob/ipad8-lite/docs/runs/IPAD8_J171AAP_23H128.md) 自述恢复/SSHRD 成功，但正常启动仍卡 Recovery，所提 iBEC 修补**尚未真机启动验证**。这些是贡献者记录，未独立复现；PR 尚无合并或 IPA 发布。**A12 此构建使用 PPL，记录明确无 SPTM/TXM**；不能称为 27.0.1 SPTM 利用链，也不支持 iOS 26.6/26.6.1/26.6.2 或 27.0.1 的新证据。依赖 Mac/USB/有线启动，涉及抹除恢复，不适合 USB 不可用的手机，亦非普通签名 IPA。
+
 ## 二、相关但不能直接算作 27.0.1 文件访问漏洞的项目
 
 | 仓库 | 已知范围/定位 | 为什么暂不选作 27.0.1 IPA 的漏洞核心 |
