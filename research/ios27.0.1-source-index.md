@@ -41,6 +41,14 @@
 
 **修补状态补充（2026-10-27，作者回复）：** [AirliftSilence-iOS Issue #7](https://github.com/YiHoooong/AirliftSilence-iOS/issues/7#issuecomment-6431542894) 中，用户报告升级至 **iOS 27.2 RC** 后原有读回/替换流程失败；作者 YiHoooong 明确回复「27.2rc 已经修复了」。这是**作者确认的 RC 修补状态及单个用户故障报告**，与 README 已列的「27.2 beta 3+ 已修复」一致；不是对 iOS 27.0.1 新增任意 `/var` 读写能力的独立验证。
 
+### 2026-10-28 20:04（北京时间）新增：CoreMedia CVE-2026-112706 只读 PoC（非 AirLift）
+
+- **官方漏洞证据：** [Apple iOS/iPadOS 27.2 安全公告](https://support.apple.com/en-us/149230) 的 CoreMedia / CVE-2026-112706 条目确认：普通应用可能访问敏感用户数据，修复方式为额外权限限制；[26.7.2 公告](https://support.apple.com/en-us/149227) 亦列出修复。**Apple 未公开确认下述研究者所述的具体 fd 利用机制、可读路径或设备日志。**
+- **新源码（2026-10-28 12:04:34 UTC 提交）：** [MchinaMd57764/CVE-2026-112706-CoreMedia-fd-leak](https://github.com/MchinaMd57764/CVE-2026-112706-CoreMedia-fd-leak)，包含 Xcode Swift PoC、[iOS 27.0.1（24A446）作者日志](https://github.com/MchinaMd57764/CVE-2026-112706-CoreMedia-fd-leak/blob/main/evidence/wave4_ios2701_result.txt)、[受限路径测试](https://github.com/MchinaMd57764/CVE-2026-112706-CoreMedia-fd-leak/blob/main/evidence/wave5_domain_map.txt)。源码可确认通过 CoreMedia/XPC 请求并读取返回的文件描述符；**真机成功仅为仓库作者提交的日志，未独立复现**，作者自称独立向 Apple 报告并被判为重复发现，不能当作 Apple 对其个人测试的背书。
+- **明确的能力边界：** 作者日志称 iOS 27.0.1 上普通应用直接 `open()` 返回 EPERM，但 CoreMedia 通道读出了 `/private/var/mobile/Media/iTunes_Control/iTunes/MediaLibrary.sqlitedb`（835,584 字节）和 WAL（1,862,272 字节），并列出了该 **iTunes 子目录** 13 个条目；对 DCIM、TCC、其他应用容器、整个 `/var` 等路径的访问未成功。**仅指定文件读取与指定目录枚举**；未证明通用列目录、任意文件读取、新建、覆盖或重启后持久性。作者报告写入请求返回 -12878（拒绝），**不能用来修改受保护文件**。
+- **版本、安装与许可证：** 作者报告在 iOS 26.5、27.0、27.0.1 真机成功，未给出 iOS 26.6/26.6.1/26.6.2 各版本的独立日志；Apple 修补信息涵盖 iOS/iPadOS 26.7.2 与 27.2。仓库为 **Xcode 工程与 PoC 源码，未见已签名或普通用户可直接安装的 IPA**；构建/安装需 Mac、Xcode 和开发签名，首次部署通常需要 USB/设备信任（不能推断支持免 USB 首次安装）；运行时利用的是手机内 CoreMedia 服务，README 未要求 LocalDevVPN、AirLift 或主机端持续连接。仓库未见明确 LICENSE，**不得假设可以复制或合并源码**。
+- **研究结论：** 这是新的 **24A446 受限只读 PoC/作者日志**，与 AirTraffic 文件搬运不同；对只读研究有价值，**不满足用户的任意 `/var` 读写或免 USB 即装即用 IPA 目标**。仅新增证据索引，未合并漏洞代码或修改构建。
+
 ## 二、相关但不能直接算作 27.0.1 文件访问漏洞的项目
 
 | 仓库 | 已知范围/定位 | 为什么暂不选作 27.0.1 IPA 的漏洞核心 |
