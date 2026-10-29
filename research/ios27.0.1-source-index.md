@@ -68,6 +68,14 @@
 | [Xplo8E/Liter8](https://github.com/Xplo8E/Liter8) | iPhone 11 特定机型 + Mac/USB + 有线启动研究，27.0.1 实验性 | 不符合现有设备和免线 IPA 需求。 |
 | [FrizzleM/SideInstaller](https://github.com/FrizzleM/SideInstaller) | iOS 侧载/配对工具 | 可以辅助安装或配对，但它本身不提供 `/var` 沙盒逃逸。 |
 
+### 2026-10-29 08:33：状态栏归档的 24A446 真机回读与行为纠错（特定文件，非通用 /var 读写）
+
+- **原始新增提交：** [Prognosticate-X/ios27-carrier-lockscreen-research — 66627e94](https://github.com/Prognosticate-X/ios27-carrier-lockscreen-research/commit/66627e94be0439f49ade825a6276d4098c779433)，2026-10-29 00:33:53 UTC；08:35 左右合并 [PR #6](https://github.com/Prognosticate-X/ios27-carrier-lockscreen-research/pull/6)。包含状态栏覆写工具、逆向文档、实机对照报告及安全预检更新。
+- **作者真机记录（未独立复现）：** [iPhone 14 Pro / iOS 27.0.1（24A446）验证报告](https://github.com/Prognosticate-X/ios27-carrier-lockscreen-research/blob/main/docs/EN/03_hardware_and_verification/2026-10-29_displayvalue-omission-hardware-verification.md) 称通过 **macOS + USB + 已信任配对的 AirLift 主机工具** 投递 `/var/mobile/Library/SpringBoard/StatusBarOverrides.archive`，再取回文件，961 字节逐字节一致；报告附 UI 对照截图，但设备日志与过程尚无第三方独立核验。
+- **本轮新增的具体结论：** 省略 `displayValue` 时，顶部状态栏显示 **0 格灰色信号条**，不是实时基带格数；控制中心绿色蜂窝按钮仍显示实时信号。作者据此恢复工具默认 `displayValue=4`。这是**既有特定文件投递/回读路径的细化实测**，并未新增任意目录列举、任意已有文件读取、通用新建、任意文件覆盖或重启后内容持久性的独立证据。
+- **适用边界与风险：** 原方案是 Mac 主机端 AirLift，不是手机端 IPA；首次 USB 可信配对仍是前提，不需要 LocalDevVPN 或手机 IPA 签名；未提供 Windows 同等流程或免 USB 首次配对证据。作者另记录 [iOS 27 最小备份系统恢复导致设备进入设置助理且目标文件未写入](https://github.com/Prognosticate-X/ios27-carrier-lockscreen-research/blob/main/docs/EN/04_research_handoffs/2026-10-28_name-only-live-override.md)，**不可在主力机复现该备份写入实验**。与 27 beta 兼容性声明无关。
+- **证据等级：** 提交和文档可核验；文件投递、961 字节回读与 UI 效果为作者自述；**没有独立设备复现，不代表整个 `/var` 可写**。本索引仅引用研究成果，未合并其源码。
+
 ## 三、可以借鉴、但不能直接等同为成功漏洞利用的组件
 
 1. **手机端通信/配对：** 优先研究 [AirCard-iOS 的 `rust-core/src/pairing.rs`](https://github.com/Mak5er/AirCard-iOS/blob/main/rust-core/src/pairing.rs)、`grappa.rs` 与现有本机配对流程，评估无需 USB 是否能够实际完成可信配对。
