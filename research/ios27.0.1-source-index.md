@@ -76,6 +76,13 @@
 - **适用边界与风险：** 原方案是 Mac 主机端 AirLift，不是手机端 IPA；首次 USB 可信配对仍是前提，不需要 LocalDevVPN 或手机 IPA 签名；未提供 Windows 同等流程或免 USB 首次配对证据。作者另记录 [iOS 27 最小备份系统恢复导致设备进入设置助理且目标文件未写入](https://github.com/Prognosticate-X/ios27-carrier-lockscreen-research/blob/main/docs/EN/04_research_handoffs/2026-10-28_name-only-live-override.md)，**不可在主力机复现该备份写入实验**。与 27 beta 兼容性声明无关。
 - **证据等级：** 提交和文档可核验；文件投递、961 字节回读与 UI 效果为作者自述；**没有独立设备复现，不代表整个 `/var` 可写**。本索引仅引用研究成果，未合并其源码。
 
+### 2026-10-29 17:45（北京时间）：GoldenNugget 备份缓存修复与版本号调整（非沙盒突破）
+
+- **已核实的上游源码变化：** [GoldenNugget 提交 `5e70f09`](https://github.com/GoldenNugget-Team/GoldenNugget/commit/5e70f09f9a3220a69a65b4c1ff87a1f5a8fdc639)（2026-10-29 09:38:54 UTC）修复「启用加密备份时，增量缓存主副本的加密 `Manifest.db` 被错误当成损坏 SQLite」问题，补充 DeviceLink 无响应超时（默认 900 秒）、进度心跳及 iOS 27 文件树路径分类，并加入离线回归测试。该修复回应 [Issue #81](https://github.com/GoldenNugget-Team/GoldenNugget/issues/81)：**第三方用户**报告 iPhone 16 Pro Max、**iOS 27.0（24A437）**、Mac + USB 的 9.7.2 在「Device data 46%」卡住，产生约 25.5 万个占位文件、没有完成有效载荷写入。**Issue 为用户反馈，补丁为可核查源码，尚无修复后真机成功的独立证据。**
+- **版本和构建：** [提交 `861aabe`](https://github.com/GoldenNugget-Team/GoldenNugget/commit/861aabe164e6f9ed4209b400168126562286ae73)（2026-10-29 09:45:40 UTC）仅将源码版本号从 9.7.2 调为 **9.7.3**；截至本次检查，[官方 Releases](https://github.com/GoldenNugget-Team/GoldenNugget/releases) 页面可核实的最新正式发行仍为 **9.7.2**，不能把版本号提交当成已发布可下载的 9.7.3 二进制或 IPA。
+- **目标能力与设备条件：** 这是电脑端备份/恢复可靠性修复，**不是** AirTraffic 沙盒逃逸原语、受保护 `/var` 任意读写、免 USB 首次配对或手机端 IPA。相关问题环境为 Mac + USB + 设备信任；项目存在 Windows 桌面构建，但**此次补丁未有 Windows/27.0.1（24A446）真机独立复现**。无新增 LocalDevVPN 要求，亦无 IPA 签名需求（桌面应用）。目录列举、文件读取、新建、覆盖、写后回读及重启持久性均**没有新增验证**。
+- **判定：** 可追踪的源代码维护进展，适合关注后续 Release/真机回归；不改变 iOS 26.6/26.6.1/26.6.2 与 iOS 27.0.1 受保护文件权限结论。
+
 ## 三、可以借鉴、但不能直接等同为成功漏洞利用的组件
 
 1. **手机端通信/配对：** 优先研究 [AirCard-iOS 的 `rust-core/src/pairing.rs`](https://github.com/Mak5er/AirCard-iOS/blob/main/rust-core/src/pairing.rs)、`grappa.rs` 与现有本机配对流程，评估无需 USB 是否能够实际完成可信配对。
