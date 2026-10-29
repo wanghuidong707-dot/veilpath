@@ -83,6 +83,8 @@
 - **目标能力与设备条件：** 这是电脑端备份/恢复可靠性修复，**不是** AirTraffic 沙盒逃逸原语、受保护 `/var` 任意读写、免 USB 首次配对或手机端 IPA。相关问题环境为 Mac + USB + 设备信任；项目存在 Windows 桌面构建，但**此次补丁未有 Windows/27.0.1（24A446）真机独立复现**。无新增 LocalDevVPN 要求，亦无 IPA 签名需求（桌面应用）。目录列举、文件读取、新建、覆盖、写后回读及重启持久性均**没有新增验证**。
 - **判定：** 可追踪的源代码维护进展，适合关注后续 Release/真机回归；不改变 iOS 26.6/26.6.1/26.6.2 与 iOS 27.0.1 受保护文件权限结论。
 
+**2026-10-29 18:08（北京时间）后续 CI 构建核查：** [GoldenNugget Actions #40853678061](https://github.com/GoldenNugget-Team/GoldenNugget/actions/runs/40853678061) 于 17:57（北京时间）因提交 [`977f886`](https://github.com/GoldenNugget-Team/GoldenNugget/commit/977f886113d330d51b0bab4872436a4a267b3f57) 触发，运行结果为 **success**；Actions 可核查到 `GoldenNugget_Windows`（约 204 MB）、`GoldenNugget_macOS_Universal2`（约 480 MB）、Linux 两种架构的桌面构件，最新 macOS 构件于 18:08 创建。该提交主要统一 PyInstaller 输出名称及 Actions 构件名称，不增加 iOS 文件权限。**这是包含此前 9.7.3 源码修复的桌面 CI 构建成功证据，不是 GitHub Release 9.7.3，也不是 IPA 发布或 27.0.1 实机成功证明。** [官方 Releases](https://github.com/GoldenNugget-Team/GoldenNugget/releases) 仍以 9.7.2 为最新正式发行。Windows 构件不证明免 USB 首次配对；没有新增 VPN、IPA 签名、任意 `/var` 列目录/读取/新建/覆盖/回读/重启持久性能力。此项仅记录构建元数据，不合并第三方代码。
+
 ## 三、可以借鉴、但不能直接等同为成功漏洞利用的组件
 
 1. **手机端通信/配对：** 优先研究 [AirCard-iOS 的 `rust-core/src/pairing.rs`](https://github.com/Mak5er/AirCard-iOS/blob/main/rust-core/src/pairing.rs)、`grappa.rs` 与现有本机配对流程，评估无需 USB 是否能够实际完成可信配对。
