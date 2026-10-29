@@ -68,6 +68,13 @@
 | [Xplo8E/Liter8](https://github.com/Xplo8E/Liter8) | iPhone 11 特定机型 + Mac/USB + 有线启动研究，27.0.1 实验性 | 不符合现有设备和免线 IPA 需求。 |
 | [FrizzleM/SideInstaller](https://github.com/FrizzleM/SideInstaller) | iOS 侧载/配对工具 | 可以辅助安装或配对，但它本身不提供 `/var` 沙盒逃逸。 |
 
+### 2026-10-30 01:48（北京时间）补充发现：GpGp700/3105 2.0.1 仅开放 24A446 版本门槛（不等于漏洞适配）
+
+- **新收录的仓库和来源：** [GpGp700/3105](https://github.com/GpGp700/3105) 于 **2026-10-22 03:00:43 UTC** 发布 [提交 `df4b2e2`](https://github.com/GpGp700/3105/commit/df4b2e2d1553bbaf87cc9714366b155cbe9bb7a2)，README/CHANGELOG **声称已验证** iOS 27.0.1（24A446），版本标注 2.0.1。它是从 YangJiiii/3105 源码派生的独立仓库（GitHub 元数据 `fork:false` 不代表代码独立）。**尚无作者真机日志、独立实机复现或 24A446 受保护文件回读证据**。
+- **源码差异核验：** 对比 [GpGp700 的 `SupportPolicy.swift`](https://github.com/GpGp700/3105/blob/main/ThreeOneOSFive/helpers/SupportPolicy.swift) 与 [YangJiiii 上游同文件](https://github.com/YangJiiii/3105/blob/main/ThreeOneOSFive/helpers/SupportPolicy.swift)，本次可核实的 27.0.1 变化是加入 `("27.0.1", "24A446")` 并放宽版本白名单；两仓库 `exploit/bad_query.c`、`helpers/SBX.swift`、`helpers/KernelExploit.swift`、`exploit/mcm_bridge.m` 的 Git blob SHA **完全相同**。**白名单通过不等于底层沙盒逃逸在 24A446 上成功**，也不代表可以读写整个 `/var`。
+- **IPA 构建证据：** [Actions #39714751656](https://github.com/GpGp700/3105/actions/runs/39714751656) 于 **2026-10-22 03:03 UTC** 成功，产出 `3105-unsigned-ipa`（约 **3.86 MB** 的 Actions ZIP 构件），不是已签名 IPA 或安装/真机成功的证明；[Releases](https://github.com/GpGp700/3105/releases) 无正式发行。README 要求**企业证书签名**，称 SideStore、AltStore、3uTools、LiveContainer 不是受支持的安装途径。构建由云端 macOS 执行，**未见免 USB 首次配对、Windows 本地部署、LocalDevVPN 或可回读写入的新增证明**。
+- **权限与许可结论：** 没有新增独立证据支持任意列目录、读取已有受保护文件、新建、覆盖、回读哈希或重启持久性。仓库标注 GPL-3.0，但包含第三方来源，不能推断每个利用模块均可自由重分发。**仅加入证据索引，未复制、合并或编译第三方利用代码**。此项属于“新发现的 24A446 支持宣称与可核实构建”，**不是新的漏洞或真机能力突破**。
+
 ### 2026-10-29 08:33：状态栏归档的 24A446 真机回读与行为纠错（特定文件，非通用 /var 读写）
 
 - **原始新增提交：** [Prognosticate-X/ios27-carrier-lockscreen-research — 66627e94](https://github.com/Prognosticate-X/ios27-carrier-lockscreen-research/commit/66627e94be0439f49ade825a6276d4098c779433)，2026-10-29 00:33:53 UTC；08:35 左右合并 [PR #6](https://github.com/Prognosticate-X/ios27-carrier-lockscreen-research/pull/6)。包含状态栏覆写工具、逆向文档、实机对照报告及安全预检更新。
