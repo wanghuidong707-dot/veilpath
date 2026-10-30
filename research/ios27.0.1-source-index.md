@@ -140,3 +140,12 @@
 
 ---
 *维护说明：这是一份来源清单和工程可行性审查，不是自动同步的漏洞源码集合，也不是实机兼容性认证。*
+
+
+### 2026-10-30 18:49（北京时间）新增：CVE-2026-112705（AVEVideoEncoder）崩溃 PoC 与 24A446 作者日志（**不是文件读写**）
+
+- **Apple 官方已确认的漏洞（2026-10-26 公告）：** [iOS/iPadOS 27.2 安全公告](https://support.apple.com/en-us/149230) 的 AVEVideoEncoder / CVE-2026-112705 条目将其描述为越界写入，影响为「应用可能导致系统意外终止」，已通过边界检查修复；原始报告人是 Marco Schmitt、Andrey Chernykh、Josh Maine（Calif.io）。**苹果未宣布任意内核读写、沙盒逃逸、/var 文件读写或越狱能力**；不能把这条 CVE 等同于 Calif 完整越狱利用链。
+- **新公开的 PoC（代码存在已核验）：** [Lak453/CVE-2026-112705-poc](https://github.com/Lak453/CVE-2026-112705-poc) 于 2026-10-30 08:02 UTC 发布 Swift/VideoToolbox 的一次性崩溃复现源码；其 README 自述 iOS **26.0（23A330）** 设备 2/2 触发重启，**没有** 24A446 真机日志。仅为崩溃验证，非任意读写或越狱。
+- **明确针对 iOS 27.0.1（24A446）的新源码与作者证据：** [MchinaMd57764/AVETemporalPoC-CVE-2026-112705](https://github.com/MchinaMd57764/AVETemporalPoC-CVE-2026-112705) 于 2026-10-30 09:29 UTC 创建，源码初始提交日期为 09:26 UTC，10:06 UTC 更新说明。项目提供 Swift/Xcode 工程、VideoToolbox 测试代码，以及 [panic-evidence 目录](https://github.com/MchinaMd57764/AVETemporalPoC-CVE-2026-112705/tree/main/panic-evidence) 中约 1.69 MB 的 `.ips` 日志文件；README **作者自述** iPhone 17 Pro / iOS 27.0.1（24A446）触发 AppleAVE2 kernel panic，iOS 27.2 同参数被拒绝。**仓库源码、日志文件的存在和 SHA 可核验，但设备来源、日志真实性、崩溃可重复性及修补差异未由本监测独立实机验证。** [evan5208 同名仓库](https://github.com/evan5208/AVETemporalPoC-CVE-2026-112705) 为其 GitHub fork，提交 SHA 相同，**不是第二份独立实机证据**。
+- **能力分级：** 这两份公开研究仅涉及视频编码驱动的**崩溃/拒绝服务复现**；没有证明列举受保护目录、读取文件、新建文件、覆盖已有文件、远端回读哈希、重启后文件持久性、任意内核读写或完整沙盒逃逸。27.0.1 证据为作者日志，不能当成独立核验。也不能从 27.0.1 推断 iOS 26.6/26.6.1/26.6.2 已成功复现。
+- **部署与风险：** 仅提供 Xcode 源码，未发现签名 IPA、Actions IPA 构件或 Release；需 **macOS + Xcode + 开发签名**部署到真机，首次设备部署/信任通常涉及 USB（仓库未证明免 USB），未要求 LocalDevVPN、AirTraffic 或已配对主机作为触发条件。该 PoC 可能导致设备内核崩溃和重启，**不建议在主力机运行**。未发现明确的 LICENSE，不能推断允许复制或合并代码。本次**仅更新证据索引，未合并利用源码、未构建或执行 PoC**。
