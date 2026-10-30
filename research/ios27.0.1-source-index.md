@@ -94,6 +94,12 @@
 
 **2026-10-30 15:35（北京时间）后续上游合并与 CI 核验（非权限突破）：** [GoldenNugget PR #82](https://github.com/GoldenNugget-Team/GoldenNugget/pull/82) 于北京时间 **15:21** 合并（[合并提交 `7e08606`](https://github.com/GoldenNugget-Team/GoldenNugget/commit/7e08606944b33c0541ab5e26c7676b5758078c7d)）。核对差异涉及四个 Python 文件：移除已停用的 FeatureFlag / UIKit 偏好写入器，加载旧预设时跳过这些项，并在 AutoSave 中禁用旧选择；PR 作者注明仅通过 Python 语法和差异检查，**未进行设备操作**。[Actions #41019586834](https://github.com/GoldenNugget-Team/GoldenNugget/actions/runs/41019586834) 显示该合并提交的桌面构建成功，产生 Windows（204,505,452 字节）、macOS Universal2（480,082,986 字节）、Linux x64/aarch64 构件；**这些是桌面 CI 产物，不是 IPA 或实体机验证**。截至核查，[正式 Releases](https://github.com/GoldenNugget-Team/GoldenNugget/releases) 仍为 **9.7.2**；没有新 27.0.1（24A446）真机证据、AirTraffic 利用原语、受保护 `/var` 目录枚举/读取/新建/覆盖/回读/重启持久性验证，也没有免 USB 首次配对改进。桌面版支持 Windows/macOS，但目标机仍需设备连接及可信配对；本次变更不涉及 VPN 或手机 IPA 签名。仅补充可复核元数据，**未合并任何第三方利用源码**。
 
+### 2026-10-30 15:40（北京时间）新增 AirTraffic 手机端源码/构建候选：CocoWall（**尚未验证 27.0.1**）
+
+- **源码和构建已核实：** [zhy976073500-cyber/CocoWall](https://github.com/zhy976073500-cyber/CocoWall) 是 2026-10-27 建立的 SwiftUI + Rust idevice + 内置 PacketTunnel 壁纸工具；代码中有 [ATC 同步](https://github.com/zhy976073500-cyber/CocoWall/blob/main/rust-core/src/atc.rs)、[AFC/StreamingZip 暂存](https://github.com/zhy976073500-cyber/CocoWall/blob/main/rust-core/src/stage.rs)、[Grappa](https://github.com/zhy976073500-cyber/CocoWall/blob/main/rust-core/src/grappa.rs)、配对与壁纸写入调用路径。[Actions #41020338668](https://github.com/zhy976073500-cyber/CocoWall/actions/runs/41020338668) 于北京时间 15:28 开始、构建成功，15:32 产生 CocoWall-iOS-IPA 构件（ZIP 4,753,758 字节，内含未签名 CocoWall-unsigned.ipa）；这是**真实源码和 CI 打包证据，不是已签名可安装或实机写入成功证明**。目前无正式 Release。
+- **版本与权限边界：** [README](https://github.com/zhy976073500-cyber/CocoWall/blob/main/README.md) 声称 iOS 17+、仅 iPhone，目标为导入 .tendies 壁纸到特定 PosterBoard 目录。[规格](https://github.com/zhy976073500-cyber/CocoWall/blob/main/SPEC.md) 将 27.0.1 正式版列为**未验证**，仅描述其他项目的 iOS 27 Beta/26.x 直写适配；**不能推断 24A446 支持**。代码包含特定文件/目录同步实现，但没有独立 24A446 实机证据证明任意受保护 /var 列目录、读取、新建、覆盖、远端回读或重启持久性。项目中提及部分真机故障日志，不等于成功操作记录。
+- **部署与许可证：** GitHub Actions 使用 macOS runner + Xcode 构建，非 Windows 原生编译；iPhone 端方案内置 PacketTunnel（需系统 VPN 授权），并宣称 iOS 27 可机内 PIN 配对或导入配对文件，但**未独立验证 27.0.1 无 USB 首次可信配对**。IPA 未签名，安装前仍需有效签名；不需要把“内置隧道”误记为外部 LocalDevVPN 的必需依赖。仓库目前**未找到 LICENSE**，不能据公开源码直接认定允许第三方复制、修改或再分发；只记录来源，**不合并代码**。
+
 ## 三、可以借鉴、但不能直接等同为成功漏洞利用的组件
 
 1. **手机端通信/配对：** 优先研究 [AirCard-iOS 的 `rust-core/src/pairing.rs`](https://github.com/Mak5er/AirCard-iOS/blob/main/rust-core/src/pairing.rs)、`grappa.rs` 与现有本机配对流程，评估无需 USB 是否能够实际完成可信配对。
