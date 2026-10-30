@@ -55,6 +55,9 @@ enum SelfTestRunner {
         checks.append(testDirectoryAccess(name: "Internal daemon containers", path: ContainerKind.internalDaemon.rootPath))
         checks.append(testDirectoryAccess(name: "App Group containers", path: ContainerKind.appGroup.rootPath))
         checks.append(testDirectoryAccess(name: "System Group containers", path: ContainerKind.systemGroup.rootPath))
+        // These probes use only direct filesystem APIs and an ephemeral canary.
+        // Do not mistake the own-sandbox roundtrip for an escape.
+        checks.append(contentsOf: SandboxBoundaryProbe.run())
         #endif
         checks.append(testStructuredFormats())
         checks.append(testAdvancedPreviewFormats())
