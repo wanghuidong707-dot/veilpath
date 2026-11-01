@@ -72,7 +72,7 @@
 | [TT0FF999/WorkSlop](https://github.com/TT0FF999/WorkSlop) | 组合 `bad_query`、AirLift 和备份还原；子功能版本范围各异 | 有 AirLift 模块可学习，但没有对整个工具在 27.0.1 任意路径读写的证明。 |
 | [GoldenNugget-Team/GoldenNugget](https://github.com/GoldenNugget-Team/GoldenNugget) | 使用 AirLift 修改特定素材/系统配置 | 可作集成案例，和一套通用 `/var` 管理器不是同一件事。 |
 | [IvanIVGrozny/iOS27.0.1-SPTM-Research](https://github.com/IvanIVGrozny/iOS27.0.1-SPTM-Research) | SPTM 固件差异与竞态修补研究 | README 明确声明**没有工作利用程序**；脚本是静态分析工具，不是可集成 IPA 的现成漏洞。 |
-| [Xplo8E/Liter8](https://github.com/Xplo8E/Liter8) | iPhone 11 特定机型 + Mac/USB + 有线启动研究，27.0.1 实验性 | 不符合现有设备和免线 IPA 需求。 |
+| [Xplo8E/Liter8](https://github.com/Xplo8E/Liter8) | iPhone 11（n104ap）上 27.0.1（24A446）作者标记为已跑通；11 Pro/Pro Max 同版本仅实验性；Mac/USB/pwn DFU 有线启动 | 仅限改写固件后、每次启动依赖 Mac 的特定机型流程；不适用于普通未越狱 IPA 或免线任意 `/var` 读写。无独立 24A446 复现。 |
 | [FrizzleM/SideInstaller](https://github.com/FrizzleM/SideInstaller) | iOS 侧载/配对工具 | 可以辅助安装或配对，但它本身不提供 `/var` 沙盒逃逸。 |
 
 ### 2026-10-30 01:48（北京时间）补充发现：GpGp700/3105 2.0.1 仅开放 24A446 版本门槛（不等于漏洞适配）
@@ -268,3 +268,12 @@
 - **操作证据分级：** 仅有**源码**尝试列举指定 PosterBoard 数据仓及读取描述信息，修复后真机是否成功**未验证**；**新建任意受保护文件、覆盖已有受保护文件、写后远端回读、重启持久性均无新证据**。作者 #108 真机记录只证明旧流程遇到回执解析和 AFC rename 错误；未取得本次修复后的真机成功记录，亦无独立设备复现。不能将某个受保护数据仓的定向操作概括为整个 `/var` 任意读写。
 - **平台与部署边界：** macOS/Xcode 云端可编译，Windows 可下载 Actions 构件但**未证实 Windows 原生编译**；手机安装需有效 IPA 签名，运行相关功能仍需**外部 LocalDevVPN 与可信配对信息**。尚无证据证明在 iOS/iPadOS **27.0.1（24A446）** 可完全免 USB 完成**首次**可信配对；旧配对凭据能否沿用需另验。**iOS 26.6/26.6.1/26.6.2** 没有新的独立文件权限证据；Calif 没有新增可公开获取的完整越狱工具，SPTM 未见可复现的新权限突破。iOS 27 Beta 声明不作为 27.0.1 正式版证据。
 - **周边项目核查：** 17 个指定仓库截至本轮未见新增相关源码提交或正式 Release。AirCard-iOS [Issue #90](https://github.com/Mak5er/AirCard-iOS/issues/90) 于北京时间 11 月 1 日 10:00 有第三方用户回复升级至 27.2 beta 3+ 后素材消失，仅为**用户报告**，与此前修补范围一致，不是新的 27.0.1 权限证据。新增搜索中的 AirFetch、CoreMedia CVE-2026-112706 等项目已在本索引收录；其 Fork 不计作独立复现。本次**只更新索引，不合并第三方利用代码、不运行 IPA、不宣称真机实测**。
+
+
+### 2026-11-01 13:42（北京时间）增量：Liter8 新增 iOS 27.2 正式版（24B119）有线启动源码，27.0.1 目标权限结论不变
+
+- **可核实的新提交：** [Xplo8E/Liter8 `bedebd7b`](https://github.com/Xplo8E/Liter8/commit/bedebd7b67198ebb519eb901084bc738d3e22b9b)，提交时间 **2026-11-01 13:10:41 北京时间**，新增 iOS **27.2 正式版（24B119）** 的固件工作流、内核签名/补丁解析器、对应测试及 README 版本矩阵；这不是 27.0.1（24A446）新利用代码。源码变更已核实，尚无独立真机复现。
+- **作者真机记录（非独立验证）：** 提交注释声称作者于 **10 月 31 日** 在 **iPhone 11（n104ap）** 完成 27.2 正式版抹除恢复、SSHRD、正常启动、重复启动、Procursus 完成与调试器设置；作者以设备 `/var/mobile/jbboot.log` 两次启动记录作为依据，但本轮没有获取原始设备日志或第三方复现。新代码不代表任意原生 27.2 设备都可用。
+- **27.0.1 原有能力的准确分级：** [当前 README 版本矩阵](https://github.com/Xplo8E/Liter8/blob/main/README.md) 对 **iPhone 11 + 24A446** 标注 `run`，即**作者自述曾完成恢复、正常启动及重启**；对 **11 Pro / 11 Pro Max + 24A446** 仅标注 `experimental`，未真机启动。此前索引将 27.0.1 一概写作“实验性”，本次据作者 README 纠正，**不把作者声明升级为独立验证，也不误认为本轮新产生 27.0.1 实测**。
+- **部署限制：** [项目 README](https://github.com/Xplo8E/Liter8/blob/main/README.md) 明确需要 **Mac、USB、pwn DFU**，每次启动必须由 Mac 执行 `fw boot`，恢复过程会**抹除手机数据**且依赖苹果对目标固件的签名；**无 Windows 原生支持、无需也不能以 LocalDevVPN/普通签名 IPA 替代**。这是针对受支持 iPhone 11 的**有线定制固件/内核补丁启动**，不是在未修改系统上的 IPA 沙盒逃逸；不能将改写固件后的 root SSH 当作原生 iOS 27.0.1 的任意 `/var` 文件读写 PoC。对用户现有较新机型及 USB 不可用场景不适用。
+- **发布/许可证：** 该仓库最新正式 Release 仍为 [v0.2.1](https://github.com/Xplo8E/Liter8/releases/tag/v0.2.1)，无新增 IPA；MIT 许可证未见变化。**本轮 iOS/iPadOS 27.0.1（24A446）及 26.6/26.6.1/26.6.2 未新增独立证据**，证明原生普通 IPA 对受保护 `/var` 的列目录、读文件、新建、覆盖、写后回读和重启持久性。Calif 未见新公开工具，SPTM 未见新可复现突破；未合并第三方利用代码、未运行设备测试。
