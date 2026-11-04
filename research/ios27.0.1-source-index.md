@@ -688,3 +688,11 @@
 - **新增公开视频（作者演示、未独立复现）：** [Calif 2026-11-03 X 视频媒体](https://t.co/1UyxPHQUAe)；[MacRumors 2026-11-03 报道](https://www.macrumors.com/2026/11/03/iphone-jailbreak-lockdown-mode/)记录 **iPhone 18 Pro** 在开启 Lockdown Mode 时，通过 AirDrop 接收 PDF 后出现被攻陷的演示画面，随后安装 **iOS 27.2**，演示中的越狱状态似乎仍在。报道**未给出初始系统的精确版本/Build**，也未证明一台**原本就运行 27.2** 的设备能从零完成利用；不能把「升级后仍保留状态」误写成「27.2 新装可越狱」或「27.0.1（24A446）本轮新增支持」。
 - **证据等级与缺口：** 这是作者公开视频与媒体复述，不是独立的设备复现；未公开完整漏洞链、源码、PoC、IPA、签名权限、可用安装流程、设备连接/USB/VPN/配对需求或 /var 读写日志。未逐项证明跨应用容器列目录、读取已有文件、新建安全测试文件、覆盖已有文件、写后回读、重启后文件内容持久性；演示中「越狱状态跨升级」不等于「文件修改跨重启哈希回读」。
 - **面向本索引的判断：** 此项属于 Calif 研究进展，应保留为**旁证/后续监测线索**，但不能用来改变 Erosion/bad_query、AirLift 或 Veilpath 对 iOS 26.5.1/26.6/26.6.1/26.6.2、27.0.1 的兼容性与免电脑结论。Calif 此前表示向 Apple 报告漏洞、无面向普通用户发布越狱工具的计划；本轮未发现与该视频对应的公开代码或可签名 IPA。**只更新证据索引，未合并利用代码或运行任何利用。**
+
+
+### 2026-11-04 14:04（北京时间）新增核查：Readipa AirTraffic / FileService 诊断与往返实验源码（尚未验证成功）
+
+- **可核实的新源码：** [d3vin4/Readipa 提交 3a2d9ca](https://github.com/d3vin4/Readipa/commit/3a2d9ca0e0bded71219b1c1628d5868c2a273e62)，提交时间 **2026-11-04 13:12:49（北京时间）**。修改 Rust FileService 接入与 AirTraffic 实验：FileService 的 CreateSession 响应改为同时接收 reply/root 通道；对应用标识符、容器 UUID、只读 root 用户及 temporary 域作区分诊断；AirTraffic 的 FileComplete 改为分批重试，并增加通过 AirTraffic 迁出可再生元数据 plist、经 AFC 读取、再尝试移回的 **3105 风格往返测试路径**。危险移动需要用户主动开启，失败会保留恢复线索。
+- **权限/实测等级：** 源码和作者提交说明是**可独立核查的实现变化**，**不是**成功真机跨沙盒读写证据。作者提交说明明确：服务 `com.apple.coredevice.fileservice.control` 可发现且 RemoteXPC/OPACK 可通信，但对 App Store 容器的 `CreateSession` 返回 `ContainerLookupErrorDomain(3)`；不能把发现服务、列目录接口、写入 API 或试图往返移动当作真实读写成功。未提供明确机型、iOS 精确构建号、可复现的读/新建/覆盖/写后回读/重启持久回读日志，也无对受保护 `/var` 任意写权限的证据。
+- **依赖与限制：** [README](https://github.com/d3vin4/Readipa/blob/main/README.md) 明确要求 Loopback VPN（如 LocalDevVPN / StosVPN / SideStore WireGuard）、RSD 隧道及本机配对；IPA 为未签名，用户需自行签名且签名覆盖主应用和 Live Activity 扩展；项目说明 AirLift 已验证的 iOS 版本为 27.0，并未提供 27.0.1（24A446）正式版独立成功验证。该实验**不满足**完全免电脑/USB/VPN/配对文件的目标条件。构建/新版 IPA 状态本次未独立确认，不能据提交推定已发布可安装构件。
+- **与 Erosion/bad_query 区分：** 这是 Readipa 自身新增的诊断/往返实验代码，不代表 [Erosion](https://github.com/jailbreakdotparty/Erosion) 或 [bad_query](https://github.com/forcequitOS/bad_query) 上游支持范围改变，也不把 27 Beta 兼容声明视为 27.0.1 正式版证据。仅记录研究线索，不合并第三方利用代码，不执行危险修改。
