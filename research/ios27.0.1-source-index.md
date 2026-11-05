@@ -752,3 +752,11 @@
 - **失败现象（精确区分阶段）：** 变体 1 在 staging 阶段显示 `S_IFLNK`，但移动后目标显示 `S_IFDIR`（`st_nlink=2`, `st_size=64`），写入仅落在 Media 内的副本，真实受保护路径未被修改；变体 2 的悬空链接在移动后目标不存在；变体 3（绝对路径）及变体 4（多层 `../`）在 staging 阶段遭拒。报告还指出 `ATHostConnectionSendAssetCompleted` 缺乏逐资产结果，因此“调用返回成功”不等于文件真正落在预期路径。**此证据支持“27.2（24B119）该测试路径失败”的单人实机报告，而不是全部 AirLift 路径被独立证明已修补**。
 - **版本边界：** 这项证据仅属于 **iOS 27.2 正式版（24B119）**，**不能**推断 iOS 27.0.1（24A446）、iOS 26.5.1/26.6/26.6.1/26.6.2 的读写权限，也不能把此前 27 Beta 的 SystemGroup 权限错误归给 iOS 26。报告没有在目标系统上证明“列目录→读取文件→新建→覆盖→回读→重启持久回读”任何完整成功链；对受保护 `/var` 任意读写无成功证据。相关源码及原始报告仅作证据索引，**未合并利用代码**。
 - **同期 Bile 仅更新界面与分发文件：** [提交 4261748](https://github.com/d3vin4/Bile/commit/4261748e37a069a77c3d704b2d571a15665ac7f3)（**22:37:44 北京时间**）统一深灰色主题、列表背景及编辑器样式，提交说明明确无行为变化；[v0.0.1 Release](https://github.com/d3vin4/Bile/releases/tag/v0.0.1) 的 `Bile.ipa` 于 **22:38:57 北京时间**更新为 **1,027,503 字节**，取代上次索引中的 **1,011,658 字节**（后者仅为历史快照）。**未恢复 AirLift/FileService，未新增跨容器读写能力**。Erosion 仍 `0.2.1`，bad_query 无正式 Release，未发现目标版本可独立复现的免 USB/免 VPN/免配对跨容器持久读写。
+
+
+### 2026-11-05 13:34（北京时间）新增发现：AirTendies macOS/USB 定向写入 PoC（源码及 DMG，非手机 IPA）
+
+- **原始仓库与发布：** [evezme/airtendies-mac](https://github.com/evezme/airtendies-mac) 于 2026-11-04 09:58 UTC 创建；[v1.0](https://github.com/evezme/airtendies-mac/releases/tag/v1.0) 于 2026-11-04 10:28 UTC 发布 `AirTendies.dmg`（1,427,867 字节），同时间点的[源码提交](https://github.com/evezme/airtendies-mac/commit/d81f6c4b37)修复 Mac 主机端编译错误。仓库根目录提供 MIT LICENSE。**这是 macOS 应用，不是可自行签名扫码安装的 iPhone IPA**。
+- **作者实机自述（未独立复现）：** [README](https://github.com/evezme/airtendies-mac/blob/main/README.md) 报告设备标识 `iPhone15,4`、**iOS 27.0.1（24A446）**，Mac 端通过 USB 已信任配对使用 AirTraffic/AirLift，先对 PosterBoard 的两个指定描述符目录执行链接探测，再将含 4 个描述符的 Mercury `.tendies` 壁纸素材写入目标目录，并称素材在壁纸选择器中出现。README 将设备称为“iPhone 15”，但以**设备标识为准**；未提供本监测可独立核验的完整原始真机日志、视频、远端哈希回读或第三方复现。
+- **权限分级：** 源码含按已知 PosterBoard 目标路径打包相对符号链接、暂存并移动文件夹的实现；作者报告仅支持**定向创建/写入壁纸描述符目录**。目标路径探测不等于任意 `/var` 目录枚举；没有证明读取其他应用任意文件、覆盖已有文件、覆盖后远端字节/哈希回读或重启后持久性。README 所述合成 fixture 测试不连接 iPhone，也不能替代真机写入核验。
+- **依赖与适用性：** macOS 14+、Mac USB、设备解锁并点击信任、Apple Books 初始化；作者声明支持 iOS 27.0—27.2 beta 2，27.2 beta 3+ 已修补，**不应外推到 iOS 26.5.1/26.6/26.6.1/26.6.2**。无需手机端 IPA 签名或 LocalDevVPN，但**必须 Mac/USB/可信配对**，因此不符合用户免电脑/免 USB/免配对条件。仅新增索引，不下载运行 DMG，不合并第三方利用代码。
