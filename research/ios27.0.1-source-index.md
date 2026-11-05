@@ -760,3 +760,12 @@
 - **作者实机自述（未独立复现）：** [README](https://github.com/evezme/airtendies-mac/blob/main/README.md) 报告设备标识 `iPhone15,4`、**iOS 27.0.1（24A446）**，Mac 端通过 USB 已信任配对使用 AirTraffic/AirLift，先对 PosterBoard 的两个指定描述符目录执行链接探测，再将含 4 个描述符的 Mercury `.tendies` 壁纸素材写入目标目录，并称素材在壁纸选择器中出现。README 将设备称为“iPhone 15”，但以**设备标识为准**；未提供本监测可独立核验的完整原始真机日志、视频、远端哈希回读或第三方复现。
 - **权限分级：** 源码含按已知 PosterBoard 目标路径打包相对符号链接、暂存并移动文件夹的实现；作者报告仅支持**定向创建/写入壁纸描述符目录**。目标路径探测不等于任意 `/var` 目录枚举；没有证明读取其他应用任意文件、覆盖已有文件、覆盖后远端字节/哈希回读或重启后持久性。README 所述合成 fixture 测试不连接 iPhone，也不能替代真机写入核验。
 - **依赖与适用性：** macOS 14+、Mac USB、设备解锁并点击信任、Apple Books 初始化；作者声明支持 iOS 27.0—27.2 beta 2，27.2 beta 3+ 已修补，**不应外推到 iOS 26.5.1/26.6/26.6.1/26.6.2**。无需手机端 IPA 签名或 LocalDevVPN，但**必须 Mac/USB/可信配对**，因此不符合用户免电脑/免 USB/免配对条件。仅新增索引，不下载运行 DMG，不合并第三方利用代码。
+
+
+### 2026-11-05 22:26（北京时间）补充：CoreGraphics PDF Type 5 研究 PoC（仅证明空指针附近崩溃，**不是** 沙盒逃逸）
+
+- **可核实的新源码与 IPA 发布：** [marksvia/oob](https://github.com/marksvia/oob) 于 2026-11-04 17:38:39 UTC 发布[首个源码提交](https://github.com/marksvia/oob/commit/529c3e7f56b838d8eb38934e62572a5355fbf1ac)，[v1.0.0 Release](https://github.com/marksvia/oob/releases/tag/v1.0.0) 于 17:53:43 UTC 发布 **27poc.ipa（38,698 字节）**。仓库包含 `poc_run.c`、`Poc27.swift`、PDF 测试样本生成器、`build.sh` 和 `SHA256.txt`；GitHub Release 资产及源码存在性已通过仓库 API 核对，**没有下载运行 IPA 或独立验证作者提供的 SHA-256**。仓库根目录未见 LICENSE，不能默认允许复制或合并其代码。
+- **作者真机记录（未独立核验）：** README 指定 `iPhone18,1`、**iOS 27.0.1（24A446）**，作者称三次运行在 CoreGraphics `_cg_shading_type5_draw` 触发相同寄存器/崩溃位置，SIGSEGV/ACCERR，故障地址 `0x1c`。代码确实提供 5 组 PDF 测试样本和信号/寄存器捕获逻辑，但未见独立复现、完整原始真机日志或视频；**源码可审查不等于已独立复现**。
+- **关键技术边界：** 作者明确指出越界存储的目标基址为 `NULL`、写入值固定为零、故障落在未映射的第零页；**没有修改有效内存，没有任意地址写、Root、SPTM 绕过、沙盒逃逸、跨容器文件读取或 `/var` 写入能力**。README 还说明这组样本在 iOS 27.2 仍可触发，**不能**把它当作“27.2 修复了该 PoC”的证据，也不能归因于已编号 CVE。
+- **设备与部署：** 源码的 `build.sh` 需要 macOS/Xcode iPhoneOS SDK 和有效 iOS 签名身份；发布页提供已签名 IPA，但自行重签/扫码安装是否成功**未独立验证**。从代码看 PoC 运行时不要求 Mac/Windows 主机、USB、LocalDevVPN 或设备配对，也没有特殊提权 entitlement；这**只适用于触发应用内崩溃测试**，不代表存在免电脑文件读写方案。主力机不建议运行可能触发崩溃的未知研究 IPA。
+- **逐项权限判定：** 文件浏览入口、其他容器目录发现、跨容器文件读取、新建、覆盖、写后回读、重启后持久回读、受保护 `/var` 权限均**未证明**。仅索引新研究来源；没有合并第三方利用代码或修改 Veilpath 构建。
