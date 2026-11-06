@@ -769,3 +769,13 @@
 - **关键技术边界：** 作者明确指出越界存储的目标基址为 `NULL`、写入值固定为零、故障落在未映射的第零页；**没有修改有效内存，没有任意地址写、Root、SPTM 绕过、沙盒逃逸、跨容器文件读取或 `/var` 写入能力**。README 还说明这组样本在 iOS 27.2 仍可触发，**不能**把它当作“27.2 修复了该 PoC”的证据，也不能归因于已编号 CVE。
 - **设备与部署：** 源码的 `build.sh` 需要 macOS/Xcode iPhoneOS SDK 和有效 iOS 签名身份；发布页提供已签名 IPA，但自行重签/扫码安装是否成功**未独立验证**。从代码看 PoC 运行时不要求 Mac/Windows 主机、USB、LocalDevVPN 或设备配对，也没有特殊提权 entitlement；这**只适用于触发应用内崩溃测试**，不代表存在免电脑文件读写方案。主力机不建议运行可能触发崩溃的未知研究 IPA。
 - **逐项权限判定：** 文件浏览入口、其他容器目录发现、跨容器文件读取、新建、覆盖、写后回读、重启后持久回读、受保护 `/var` 权限均**未证明**。仅索引新研究来源；没有合并第三方利用代码或修改 Veilpath 构建。
+
+
+### 2026-11-06 17:41（北京时间）新增：IOSurface 内核 UAF 研究源码（iOS 27.0.1，**仅作者报告内核崩溃，不是沙盒逃逸**）
+
+- **可核查的新公开源码：** [Kimi-2011/ios27-iosurface-uaf](https://github.com/Kimi-2011/ios27-iosurface-uaf) 于 **2026-11-06 08:08:14 UTC** 首次提交[研究笔记、Objective-C harness 和分析工具](https://github.com/Kimi-2011/ios27-iosurface-uaf/commit/6d661e243afba749bbc887d10e61d8d04497b4ad)，08:09:54 UTC 的[后续提交](https://github.com/Kimi-2011/ios27-iosurface-uaf/commit/601f1460843cb52d1f593901af9bdbf20a6598c0)加入 CVE 归属推断。可核实的文件包括 [README](https://github.com/Kimi-2011/ios27-iosurface-uaf/blob/main/README.md)、[研究报告](https://github.com/Kimi-2011/ios27-iosurface-uaf/blob/main/out/RESEARCH-IOSURFACE-UAF.md)、[触发 harness 源码](https://github.com/Kimi-2011/ios27-iosurface-uaf/blob/main/harness/israce/main.panic.m)。**没有核实到公开 IPA Release 或独立真机复现；未下载、构建或运行该代码。**
+- **作者真机自述，非独立核验：** iPhone 17 Pro Max（硬件标识 **iPhone18,2**）、**iOS 27.0.1（24A446）**、xnu-13432.2.10；作者报告 IOSurfaceRoot 注册/注销竞态导致内核 use-after-free，四次独立启动均在相同静态指令触发 `Kernel tag check fault`，附 KASLR slide、PC、LR、CPU 等摘要。报告引用的 `out/israce.ndjson` 原始记录文件在本次核查时**未见公开于所述路径**，亦未核实完整 panic 日志附件、真机视频或第三方复现；不能将 4/4 作者陈述写成独立证实。
+- **CVE 与修补证据分级：** [Apple iOS 27.2 安全公告](https://support.apple.com/en-us/149230) 独立确认 **CVE-2026-112477** 为 IOSurface 竞态，修补方式为改进锁定，影响是应用可能造成系统意外终止或内核内存损坏。**该仓库将自身 UAF 对应到此 CVE 是作者根据组件、影响与反汇编差异的推断，Apple 未对这份特定 PoC 作一对一确认。** 不得与独立的 Kernel 越界写 CVE-2026-112507 混淆，也不得把 iOS 27.2 的官方修补说明外推为 iOS 26.5.1/26.6/26.6.1/26.6.2 的相同缺陷证明。
+- **部署条件：** 作者称触发路径可由不带私有 entitlement 的普通开发者签名 app 调用；运行时不声称需要 Mac/Windows、USB、LocalDevVPN、配对文件或特殊签名权限，但**仓库是源码而非可扫码安装的 IPA**，自行编译、重签及目标机安装尚无独立验证。研究 harness 的实际构建环境/依赖应另行核查；不要把“无特权 API 可达”误读成“已存在免电脑可用 IPA”。
+- **目标权限逐项：** 仅作者报告可触发内核 panic；**未证明**其他应用容器目录枚举、真实文件读取、新建文件、覆盖已有文件、写后字节/哈希回读、重启后持久回读或受保护 `/var` 任意读写。作者也明确说明尚未形成可控内核读写或利用链。此类崩溃探针有设备重启与数据风险，不建议在主力机运行。
+- **许可证与维护：** 本次核查未在仓库根目录找到 LICENSE；公开可读不等于许可复制/再分发。仅补充证据索引，不合并第三方利用代码，不改变 Veilpath 构建或现有 Erosion/bad_query 兼容性结论。
