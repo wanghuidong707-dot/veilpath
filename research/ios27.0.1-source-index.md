@@ -779,3 +779,12 @@
 - **部署条件：** 作者称触发路径可由不带私有 entitlement 的普通开发者签名 app 调用；运行时不声称需要 Mac/Windows、USB、LocalDevVPN、配对文件或特殊签名权限，但**仓库是源码而非可扫码安装的 IPA**，自行编译、重签及目标机安装尚无独立验证。**仓库所附 `harness/israce/run.sh` 明确使用 macOS 的 `xcrun`、`codesign` 和 `devicectl` 构建、签名、安装、启动并从真机取回日志，提供的复现工作流因此需要 Mac 与设备连接/开发者签名；USB 连接与既有配对是实际部署的合理前提，但脚本未独立证明只能通过 USB。** 不要把“无特权 API 可达”误读成“已存在免电脑可用 IPA”，也没有 Windows 原生复现或免配对扫码安装证据。
 - **目标权限逐项：** 仅作者报告可触发内核 panic；**未证明**其他应用容器目录枚举、真实文件读取、新建文件、覆盖已有文件、写后字节/哈希回读、重启后持久回读或受保护 `/var` 任意读写。作者也明确说明尚未形成可控内核读写或利用链。此类崩溃探针有设备重启与数据风险，不建议在主力机运行。
 - **许可证与维护：** 本次核查未在仓库根目录找到 LICENSE；公开可读不等于许可复制/再分发。仅补充证据索引，不合并第三方利用代码，不改变 Veilpath 构建或现有 Erosion/bad_query 兼容性结论。
+
+
+### 2026-11-07 11:35（北京时间）新增：EnsWilde 派生仓库本机配对代码与未签名 IPA 构件（**尚未实机证明免 USB、免 VPN 或 /var 读写**）
+
+- **源码增量可核验：** [nguyenls3005-cell/EnsWilde](https://github.com/nguyenls3005-cell/EnsWilde) 在 2026-11-07 03:11–03:25 UTC 更新了 iOS 27+ 的本机配对界面和管理器。[管理器提交 4d519daf](https://github.com/nguyenls3005-cell/EnsWilde/commit/4d519daf3d3c5ac0873c9e496c4aee248e7d63fd) 使用 AVAudioPlayer/后台音频模式尝试在跳到系统设置输入 PIN 时保持进程存活，并将 Bonjour 广播改为不额外监听同一端口；[Info.plist 提交 868b08b](https://github.com/nguyenls3005-cell/EnsWilde/commit/868b08b73a0f3fa6cc07d69892ef4f9f3bed6b71) 新增 `UIBackgroundModes=audio`。这是**真实代码修改，不是已经成功配对的设备证据**。
+- **重要代码限制：** 当前 `activateBackgroundAudio()` 只是把全零字节写成 `silent.wav`，没有构造标准 WAV 文件头；`AVAudioPlayer(contentsOf:)` 可能因格式无效而失败，且设置 `volume=0` 也不能证明系统允许无限后台运行。README 仍写明 **LocalDevVPN 必需**、iOS 26 要从电脑获取配对文件、iOS 27 使用 StikPair，并称内置配对“soon”。因此**没有证据**表明 iOS 27.0.1（24A446）已经无需 USB/配对文件/LocalDevVPN 稳定自配对。
+- **构建已核实但未实测：** [Actions #42333962794](https://github.com/nguyenls3005-cell/EnsWilde/actions/runs/42333962794) 于 2026-11-07 03:25 UTC 启动、03:28 UTC 成功，产出 **EnsWilde-Unsigned** ZIP 构件（10,281,126 字节）；不是签名安装成功、真机配对成功或新 Release。需要用户自行提供有效 IPA 签名；构建依赖 GitHub macOS CI，但用户无需本地 Mac 编译。仓库有 AGPL-3.0 LICENSE，但不能据此推断所依赖的全部第三方漏洞组件许可一致。
+- **权限与设备证据分级：** 未发现这次提交附带具体手机型号、iOS 精确 build、配对成功日志、实机视频、独立复现、其他应用容器目录列举/读取、测试文件新建/覆盖、写后哈希回读、重启持久回读或受保护 `/var` 任意读写证据。README 的 AirLift“26.0–27.2 Beta 2”笼统声明不是 24A446 的独立验证；bad_query 的 27 Beta 范围不能外推到 27.0.1 正式版。仅记录新源码和 CI 构件，不合并或运行第三方利用代码。
+- **另行排除的同日新仓库：** [0xjohnnydev/AGX-RW-macOS-PoC](https://github.com/0xjohnnydev/AGX-RW-macOS-PoC) 于 2026-11-06 21:49 UTC 首次公开；README 明确目标是 **macOS 27.0.1（26A434）上的 Mac AGX 固件**，并注明不是独立 KRW 或 SPTM 绕过。它**不是 iOS 27.0.1（24A446）漏洞、手机 IPA 或 /var 读写方案**，不能因版本号相同误收录为 iPhone 支持证据。
