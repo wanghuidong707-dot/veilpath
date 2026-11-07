@@ -838,3 +838,11 @@
 - **MobileGestalt 写入尝试：** `MobileGestaltApplyTask` 新增备份原文件、序列化 plist、通过 `BadQueryWrapper.writeFile` 尝试原子写入、重新读取并验证 plist 可解析，以及异常时尝试回滚的流程。其验证仅检查解析和 `CacheExtra`/`CacheData` 键是否存在，**未做新旧字节/哈希相等验证，更未验证重启持久性**。此外上游 [Erosion README](https://github.com/jailbreakdotparty/Erosion) 明确指出 **iOS 26 的 bad_query 无法写入 MobileGestalt**；不能因为 EnsWilde 新增调用就宣称 iOS 26.5.1—26.6.2 获得 MobileGestalt 写入权限。
 - **运行前提与证据缺口：** `ToolRunner.applyAll()` 仍检查 `isSystemReady`，失败提示明确要求 Pairing & VPN；[EnsWilde README](https://github.com/nguyenls3005-cell/EnsWilde/blob/main/README.md) 继续要求 **LocalDevVPN + pairing file**，iOS 26 首次获取配对文件需电脑。源码修改可在 GitHub 直接核查，但本轮**未核实最新 8 次提交对应的成功 IPA/Release**，没有手机型号、精确 iOS build、安装/运行视频、远端文件读取、新建、覆盖后字节回读、重启持久回读或第三方独立复现。没有证据支持 iOS 27.0.1（24A446）正式版可免 USB/电脑/配对/VPN 获得任意 `/var` 读写。该变更不涉及 iOS 27 Beta SystemGroup 错误的版本外推。
 - **安全处理：** 仅记录原始源码及限制，**未合并/执行第三方利用代码、未修改 Veilpath 构建，也未在真机尝试系统配置写入**。
+
+
+### 2026-11-07 22:12（北京时间）增量：EnsWilde 新提交的未签名 IPA 构建成功（**构建可核实，文件权限未验证**）
+
+- **相较21:49核查的实际变化：** [EnsWilde Actions #42378662328](https://github.com/nguyenls3005-cell/EnsWilde/actions/runs/42378662328) 在提交 `72f3dfc` 后失败；随后仅有两次界面配色改动：[a4d4dec](https://github.com/nguyenls3005-cell/EnsWilde/commit/a4d4dec0e12669d0a18487e01b9e35b3a80246c3)（2026-11-07 13:50:12 UTC）和 [14f389f](https://github.com/nguyenls3005-cell/EnsWilde/commit/14f389fa91db029efd4187a29471107c16c57b6f)（13:50:50 UTC）。这两次提交没有增加新的沙盒权限或读写实现。
+- **新构件已证实：** [Actions #42378821665](https://github.com/nguyenls3005-cell/EnsWilde/actions/runs/42378821665) 对应 `14f389f`，CI build 和 Upload Artifact 步骤均为 success；GitHub Artifacts 返回 `EnsWilde-Unsigned`，构件 ZIP **14,596,455 字节**，artifact ID **13577071185**，创建于 **2026-11-07 13:52:36 UTC（北京时间21:52:36）**。此前 [Actions #42378770280](https://github.com/nguyenls3005-cell/EnsWilde/actions/runs/42378770280) 对应 `a4d4dec` 也构建成功。无独立 Release；尚未下载安装/执行该构件。CI 成功不是手机上功能可用的证明。
+- **本次构件的功能边界：** 其源码包含此前已发现的 Config Tweaks / MobileGestalt 定向写入尝试，但没有新增手机型号、iOS 精确 build、签名后安装/运行视频或日志；其他应用容器的目录发现、真实文件读取、新建、覆盖、写后远端字节/哈希回读、重启后持久回读、任意受保护 `/var` 写入均**未被本次构建证明**。受保护配置文件的可见性不等于可修改性；不能将 iOS 27 Beta 声明外推至 27.0.1 正式版（24A446）。
+- **仍不符合免辅助条件：** [EnsWilde README](https://github.com/nguyenls3005-cell/EnsWilde/blob/main/README.md) 继续要求 LocalDevVPN、配对文件与 RSD 连接；iOS 26 初次获取配对文件仍需电脑。该构件未签名，需要自行签名；云端 macOS/Xcode 编译并不等于 Windows 本地无需 USB/配对即可运行目标功能。未合并或执行第三方漏洞利用代码。
