@@ -1210,7 +1210,7 @@
 
 ### 2026-11-10 13:44（北京时间）补充证据：WQ Files v0.7 在 iOS 27.2 的第三方扫描日志
 
-- **证据来源与设备：** [WQFiles Issue #8 新评论](https://github.com/kolbicz/WQFiles/issues/8#issuecomment-0) 于 **2026-11-10 05:44:06 UTC／北京时间 13:44:06** 由第三方测试者追加 **WQ Files v0.7 (build 26)** 日志，标明 **iPhone 13（iPhone14,5）、iOS 27.2（24B119）**；记录了已获得的多个 App Group entitlement。该记录是**用户自行报告并附日志，非本监测独立复现**，不是 iOS 27.0.1（24A446）或 iOS 26.x 的证据。链接使用 Issue 页面，避免臆造评论 ID。
+- **证据来源与设备：** [WQFiles Issue #8 新评论](https://github.com/kolbicz/WQFiles/issues/8) 于 **2026-11-10 05:44:06 UTC／北京时间 13:44:06** 由第三方测试者追加 **WQ Files v0.7 (build 26)** 日志，标明 **iPhone 13（iPhone14,5）、iOS 27.2（24B119）**；记录了已获得的多个 App Group entitlement。该记录是**用户自行报告并附日志，非本监测独立复现**，不是 iOS 27.0.1（24A446）或 iOS 26.x 的证据。链接指向包含原始评论的 Issue 页面。
 - **可直接从日志确认的范围：** 发现 **298 个应用容器、1053 个扩展容器、32 个 daemon 容器**，应用名称数据库将 **1382 个容器路径中的 1230 个映射到标识**，298 个应用容器中有 **297 个完成容量测量**。仍有 3 个应用容器和部分 daemon/插件未正确映射，不能称为全部容器稳定可识别。系统的 Container Manager 和 LaunchServices API 在此设备返回 0 项，作者实现的数据库解析提供名称映射。
 - **严格区分操作层级：** 第三方评论称备份功能工作正常，但附带的这段 v0.7 日志仅列出**扫描、路径发现、名称映射和容量测量**，没有展示逐文件真实读取内容、测试文件新建、覆盖前后字节/哈希校验、重启后持久回读或受保护 `/var` 任意写入；备份成功属于用户口述，不能替代读写闭环证据。没有提供完整 Mac/Windows、USB、VPN、配对、扫码自签安装链。**不外推到 iOS 26.5.1、26.6、26.6.1、26.6.2 或 27.0.1 正式版**。
 - **主线无新发布：** 本轮再次核查 [Erosion v0.3.1](https://github.com/jailbreakdotparty/Erosion/releases/tag/0.3.1) 仍为最新官方 IPA，主分支最新提交仍在北京时间 12:44 前；[bad_query](https://github.com/forcequitOS/bad_query/commits/main) 主分支仍无新核心提交。其余指定 AirLift/FilzaSlop/SPTM/WorkSlop/Liter8 等主分支未见晚于上次检查的目标权限突破。只更新文献证据，不合并利用代码，不进行真机修改。
