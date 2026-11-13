@@ -2,6 +2,11 @@ name: Build Veilpath IPA
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - 'Veilpath/**'
+      - 'Veilpath.xcodeproj/**'
+      - '.github/workflows/build-ipa.yml'
   push:
     paths:
       - '.github/workflows/build-ipa.yml'
